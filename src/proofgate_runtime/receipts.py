@@ -61,7 +61,7 @@ def make_receipt(intent: Any, result: Any, key: str | bytes | None = None,
 
 
 def verify_receipt(receipt: dict, key: str | bytes | None = None,
-                   require_signature: bool = False) -> dict:
+                   require_signature: bool = True) -> dict:
     """Verify hashes and, when present, the signature. Fail closed."""
     errors: list[str] = []
     if not isinstance(receipt, dict):
@@ -100,14 +100,15 @@ def verify_receipt(receipt: dict, key: str | bytes | None = None,
             "receipt_hash": receipt.get("receipt_hash")}
 
 
-def verify_chain(receipts: list[dict], key: str | bytes | None = None) -> dict:
+def verify_chain(receipts: list[dict], key: str | bytes | None = None,
+                 require_signature: bool = True) -> dict:
     """Verify a simple prev_hash chain (first prev_hash = GENESIS)."""
     errors: list[str] = []
     prev = "GENESIS"
     for i, rec in enumerate(receipts or []):
         if rec.get("prev_hash") != prev:
             errors.append("E_CHAIN_AT_%d" % i)
-        res = verify_receipt(rec, key=key)
+        res = verify_receipt(rec, key=key, require_signature=require_signature)
         if not res["valid"]:
             errors.extend("%s@%d" % (e, i) for e in res["errors"])
         prev = rec.get("receipt_hash", "")

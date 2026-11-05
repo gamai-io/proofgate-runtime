@@ -43,12 +43,13 @@ def main(argv: list[str] | None = None) -> int:
     m = sub.add_parser("make-receipt", help="create a receipt from intent/result JSON files")
     m.add_argument("intent")
     m.add_argument("result")
-    m.add_argument("--key-file", default=None, help="optional HMAC key file")
+    m.add_argument("--key-file", default=None, help="HMAC key file (required unless --allow-unsigned)")
+    m.add_argument("--allow-unsigned", action="store_true", help="create an unsigned receipt (not recommended)")
 
     v = sub.add_parser("verify-receipt", help="verify a receipt JSON file")
     v.add_argument("receipt")
     v.add_argument("--key-file", default=None)
-    v.add_argument("--require-signature", action="store_true")
+    v.add_argument("--allow-unsigned", action="store_true", help="accept an unsigned receipt")
 
     g = sub.add_parser("check-injection", help="lexical prompt-injection pre-filter")
     g.add_argument("text")
@@ -63,12 +64,17 @@ def main(argv: list[str] | None = None) -> int:
         _print(check(claims or [], args.reported_hash))
         return 0
     if args.cmd == "make-receipt":
-        _print(make_receipt(_load(args.intent), _load(args.result), key=_key(args.key_file)))
+        key = _key(args.key_file)
+        if key is None and not args.allow_unsigned:
+            print("refusing unsigned receipt: pass --key-file or --allow-unsigned", file=sys.stderr)
+            return 2
+        _print(make_receipt(_load(args.intent), _load(args.result), key=key))
         return 0
     if args.cmd == "verify-receipt":
-        _print(verify_receipt(_load(args.receipt), key=_key(args.key_file),
-                              require_signature=args.require_signature))
-        return 0
+        res = verify_receipt(_load(args.receipt), key=_key(args.key_file),
+                             require_signature=not args.allow_unsigned)
+        _print(res)
+        return 0 if res["valid"] else 1
     if args.cmd == "check-injection":
         _print(check_injection(args.text, args.tool))
         return 0

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 import sys
 from typing import Any
 
@@ -74,18 +75,24 @@ def call_tool(name: str, args: dict) -> dict:
     if name == "make_receipt":
         if "intent" not in args or "result" not in args:
             return _text({"error": "intent and result are required"}, True)
-        return _text(make_receipt(args["intent"], args["result"], meta=args.get("meta")))
+        key = os.environ.get("PROOFGATE_HMAC_KEY") or None
+        rec = make_receipt(args["intent"], args["result"], key=key, meta=args.get("meta"))
+        if not key:
+            rec["_warning"] = "unsigned: set PROOFGATE_HMAC_KEY to sign MCP receipts"
+        return _text(rec)
     if name == "verify_receipt":
         if not isinstance(args.get("receipt"), dict):
             return _text({"error": "receipt object is required"}, True)
-        return _text(verify_receipt(args["receipt"], require_signature=bool(args.get("require_signature"))))
+        return _text(verify_receipt(args["receipt"],
+                                        require_signature=bool(args.get("require_signature", True))))
     if name == "check_injection":
         return _text(check_injection(args.get("text", ""), args.get("tool")))
     if name == "runtime_info":
         return _text({"name": "proofgate-runtime", "version": __version__,
                       "capabilities": ["verify_claims", "make_receipt", "verify_receipt",
                                        "check_injection_lite"],
-                      "signed_receipts": "HMAC-SHA256 via CLI key file"})
+                      "signed_receipts": "HMAC-SHA256; MCP uses PROOFGATE_HMAC_KEY; unsigned rejected by default",
+                      "require_signature_default": True})
     return _text({"error": "unknown tool: %s" % name}, True)
 
 

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "proofgate-runtime"
-version = "0.1.0"
+version = "0.2.0"
 description = "Evidence-first claim verification, signed receipts, lite injection guard and MCP server (stdlib only)."
 readme = "README.md"
 requires-python = ">=3.10"

@@ -6,9 +6,10 @@ from proofgate_runtime.receipts import make_receipt, verify_receipt, canonical_j
 class ReceiptTests(unittest.TestCase):
     def test_unsigned_receipt(self):
         r = make_receipt({"op": "x"}, {"ok": True})
-        out = verify_receipt(r)
+        out = verify_receipt(r, require_signature=False)
         self.assertTrue(out["valid"], out)
         self.assertFalse(out["signed"])
+        self.assertFalse(verify_receipt(r)["valid"])
 
     def test_signed_receipt(self):
         r = make_receipt({"op": "x"}, {"ok": True}, key="secret")
@@ -29,9 +30,9 @@ class ReceiptTests(unittest.TestCase):
         self.assertFalse(out["valid"])
         self.assertIn("E_RESULT_DIGEST", out["errors"])
 
-    def test_require_signature(self):
+    def test_require_signature_default(self):
         r = make_receipt({"op": "x"}, {"ok": True})
-        out = verify_receipt(r, require_signature=True)
+        out = verify_receipt(r)
         self.assertFalse(out["valid"])
         self.assertIn("E_UNSIGNED", out["errors"])
 

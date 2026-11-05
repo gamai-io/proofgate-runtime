@@ -1,7 +1,7 @@
 # ProofGate Runtime
 
 **Evidence-first claim verification, signed receipts, and a lite injection guard for AI agents.**  
-[![PyPI](https://img.shields.io/pypi/v/proofgate-runtime.svg)](https://pypi.org/project/proofgate-runtime/) v0.1.0 · Python 3.10+ · stdlib only · Apache-2.0
+[![PyPI](https://img.shields.io/pypi/v/proofgate-runtime.svg)](https://pypi.org/project/proofgate-runtime/) v0.2.0 · Python 3.10+ · stdlib only · Apache-2.0
 
 Agent says "done". ProofGate asks: **where is the evidence?**
 
@@ -54,7 +54,7 @@ echo '{"posted":true,"total":"2808.00"}' > result.json
 printf 'shared-secret' > key.bin
 
 proofgate make-receipt intent.json result.json --key-file key.bin > receipt.json
-proofgate verify-receipt receipt.json --key-file key.bin --require-signature
+proofgate verify-receipt receipt.json --key-file key.bin
 ```
 
 Tamper with `result.json` or the receipt and verification fails closed.
@@ -89,8 +89,8 @@ Tools: `verify_claims`, `make_receipt`, `verify_receipt`, `check_injection`, `ru
 - **No anchor/lease service.** That is [`sigil`](https://github.com/gamai-io/sigil) (grants, receipts, anchor, MCP middleware). ProofGate v0.1 is the local verification core.
 - **No embedding-based guard.** This is the lexical layer; the full multilingual cascade is [`gamai-guard`](https://github.com/gamai-io/gamai-guard).
 - **No independent security audit.** Treat v0.1 as a reference implementation, not a certified product.
-- **MCP receipts are unsigned.** Signing over MCP would expose the key to the client; use the CLI with a protected key file, or call the library.
-- **PyPI 0.1.0 is available.** Install with `pip install proofgate-runtime`.
+- **MCP receipts are signed only when `PROOFGATE_HMAC_KEY` is set** and are rejected as unsigned otherwise. Set it in the server environment; never put the key in a client or in git.
+- **PyPI 0.2.0 is available.** Install with `pip install proofgate-runtime`.
 
 ## Design rules
 
@@ -107,6 +107,10 @@ Tools: `verify_claims`, `make_receipt`, `verify_receipt`, `check_injection`, `ru
 - [`crossnode-bench`](https://github.com/gamai-io/crossnode-bench) — claim-vs-truth benchmark (25,600 controlled trials; 93.75% pass; 6.25% planted lies flagged; 0 false-success on read/action/cross).
 - [`evidence-gate-runtime`](https://github.com/gamai-io/evidence-gate-runtime) — fuller runtime with replay.
 - [`floor-copilot`](https://github.com/gamai-io/floor-copilot) — production case study: invoice intake with 17% VAT gate.
+
+## v0.2 breaking change
+
+`verify_receipt()` now requires a valid signature by default. For legacy unsigned receipts, call `verify_receipt(..., require_signature=False)` or the CLI with `--allow-unsigned`. Create signed receipts with `proofgate make-receipt ... --key-file`; the MCP server signs when `PROOFGATE_HMAC_KEY` is set.
 
 ## Honest status
 
