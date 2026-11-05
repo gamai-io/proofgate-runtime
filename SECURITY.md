@@ -37,3 +37,5 @@ Out of scope:
 v0.1.0 is a reference implementation and has **not** been independently audited.
 
 Internal audit (2026-11-05): https://github.com/gamai-io/.github/blob/main/security/2026-11-05-audit.md
+
+External audit RFP (draft): docs/external-audit-rfp.md
