@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "proofgate-runtime"
+version = "0.1.0"
+description = "Evidence-first claim verification, signed receipts, lite injection guard and MCP server (stdlib only)."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+authors = [{ name = "gamAI", email = "info@gamai.io" }]
+keywords = ["ai-agents", "evidence", "trust", "receipts", "mcp", "false-success"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: Apache Software License",
+  "Operating System :: OS Independent",
+]
+
+[project.urls]
+Homepage = "https://gamai.io"
+Repository = "https://github.com/gamai-io/proofgate-runtime"
+Issues = "https://github.com/gamai-io/proofgate-runtime/issues"
+
+[project.scripts]
+proofgate = "proofgate_runtime.cli:main"
+proofgate-mcp = "proofgate_runtime.mcp_server:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

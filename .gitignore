@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+*.egg-info/
+build/
+dist/
+.venv/
+key.bin
+receipt.json
+claims.json
+intent.json
+result.json
