@@ -9,4 +9,5 @@
 - Lite lexical prompt-injection guard (`check_injection`).
 - MCP stdio server (`proofgate-runtime` tools) and CLI (`proofgate`).
 - Tests + CI (Python 3.10–3.12).
+- Published to PyPI as `proofgate-runtime` 0.1.0.
 - Extracted from `gamai-io/gamai-trust` proofgate (Apache-2.0).

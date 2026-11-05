@@ -1,7 +1,7 @@
 # ProofGate Runtime
 
 **Evidence-first claim verification, signed receipts, and a lite injection guard for AI agents.**  
-v0.1.0 · Python 3.10+ · stdlib only · Apache-2.0
+[![PyPI](https://img.shields.io/pypi/v/proofgate-runtime.svg)](https://pypi.org/project/proofgate-runtime/) v0.1.0 · Python 3.10+ · stdlib only · Apache-2.0
 
 Agent says "done". ProofGate asks: **where is the evidence?**
 
@@ -13,7 +13,13 @@ This package is the small, installable core of the gamAI trust layer:
 - **MCP server** — stdio JSON-RPC tools for OpenCode/Claude/MCP clients.
 - **CLI** — verify claims, make/verify receipts, check injection.
 
-## Install (from source)
+## Install
+
+```bash
+pip install proofgate-runtime
+```
+
+From source (development):
 
 ```bash
 git clone https://github.com/gamai-io/proofgate-runtime
@@ -84,7 +90,7 @@ Tools: `verify_claims`, `make_receipt`, `verify_receipt`, `check_injection`, `ru
 - **No embedding-based guard.** This is the lexical layer; the full multilingual cascade is [`gamai-guard`](https://github.com/gamai-io/gamai-guard).
 - **No independent security audit.** Treat v0.1 as a reference implementation, not a certified product.
 - **MCP receipts are unsigned.** Signing over MCP would expose the key to the client; use the CLI with a protected key file, or call the library.
-- **No PyPI release yet.** Install from source.
+- **PyPI 0.1.0 is available.** Install with `pip install proofgate-runtime`.
 
 ## Design rules
 
