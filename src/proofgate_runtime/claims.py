@@ -306,8 +306,9 @@ def main(argv: list[str]) -> int:
         if len(argv) < 3:
             print("usage: proofgate.py verify report.json", file=sys.stderr)
             return 2
-        print(json.dumps(verify(_read_json(argv[2])), ensure_ascii=False, indent=2))
-        return 0
+        result = verify(_read_json(argv[2]))
+        print(json.dumps(result, ensure_ascii=False, indent=2))
+        return 0 if result["ok"] else 1
     print("unknown command: %s" % cmd, file=sys.stderr)
     return 2
 

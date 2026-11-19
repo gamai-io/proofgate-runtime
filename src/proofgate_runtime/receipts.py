@@ -36,8 +36,14 @@ def _core(receipt: dict) -> dict:
 
 
 def make_receipt(intent: Any, result: Any, key: str | bytes | None = None,
-                 meta: dict | None = None) -> dict:
-    """Create a receipt. If key is provided, add an HMAC-SHA256 signature."""
+                 meta: dict | None = None, prev_hash: str = "GENESIS",
+                 extra: dict | None = None) -> dict:
+    """Create a receipt. If key is provided, add an HMAC-SHA256 signature.
+
+    ``prev_hash`` links receipts into a tamper-evident chain (GENESIS for the
+    first one). ``extra`` fields are merged before hashing so they are covered
+    by both receipt_hash and the signature.
+    """
     receipt = {
         "v": VERSION,
         "receipt_id": str(uuid.uuid4()),
@@ -46,9 +52,12 @@ def make_receipt(intent: Any, result: Any, key: str | bytes | None = None,
         "result": result,
         "intent_hash": sha256_hex(intent),
         "result_digest": sha256_hex(result),
+        "prev_hash": prev_hash,
     }
     if meta:
         receipt["meta"] = meta
+    if extra:
+        receipt.update(extra)
     receipt["receipt_hash"] = sha256_hex(_core(receipt))
     kb = _key_bytes(key)
     if kb:

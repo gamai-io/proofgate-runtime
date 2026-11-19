@@ -76,9 +76,11 @@ def call_tool(name: str, args: dict) -> dict:
         if "intent" not in args or "result" not in args:
             return _text({"error": "intent and result are required"}, True)
         key = os.environ.get("PROOFGATE_HMAC_KEY") or None
-        rec = make_receipt(args["intent"], args["result"], key=key, meta=args.get("meta"))
+        extra = None
         if not key:
-            rec["_warning"] = "unsigned: set PROOFGATE_HMAC_KEY to sign MCP receipts"
+            extra = {"_warning": "unsigned: set PROOFGATE_HMAC_KEY to sign MCP receipts"}
+        rec = make_receipt(args["intent"], args["result"], key=key,
+                           meta=args.get("meta"), extra=extra)
         return _text(rec)
     if name == "verify_receipt":
         if not isinstance(args.get("receipt"), dict):

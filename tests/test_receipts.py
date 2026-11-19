@@ -1,6 +1,7 @@
 import unittest
 
-from proofgate_runtime.receipts import make_receipt, verify_receipt, canonical_json
+from proofgate_runtime.receipts import (make_receipt, verify_receipt,
+                                        verify_chain, canonical_json)
 
 
 class ReceiptTests(unittest.TestCase):
@@ -38,6 +39,25 @@ class ReceiptTests(unittest.TestCase):
 
     def test_canonical_json_stable(self):
         self.assertEqual(canonical_json({"b": 1, "a": 2}), '{"a":2,"b":1}')
+
+    def test_make_receipt_writes_prev_hash(self):
+        r = make_receipt({"op": "x"}, {"ok": True})
+        self.assertEqual(r["prev_hash"], "GENESIS")
+
+    def test_chain_verifies(self):
+        r1 = make_receipt({"op": 1}, {"ok": True}, key="secret")
+        r2 = make_receipt({"op": 2}, {"ok": True}, key="secret",
+                          prev_hash=r1["receipt_hash"])
+        out = verify_chain([r1, r2], key="secret")
+        self.assertTrue(out["valid"], out)
+        self.assertEqual(out["count"], 2)
+
+    def test_chain_detects_break(self):
+        r1 = make_receipt({"op": 1}, {"ok": True}, key="secret")
+        r2 = make_receipt({"op": 2}, {"ok": True}, key="secret")
+        out = verify_chain([r1, r2], key="secret")
+        self.assertFalse(out["valid"])
+        self.assertIn("E_CHAIN_AT_1", out["errors"])
 
 
 if __name__ == "__main__":

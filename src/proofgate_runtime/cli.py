@@ -61,8 +61,9 @@ def main(argv: list[str] | None = None) -> int:
     if args.cmd == "verify-claims":
         data = _load(args.file)
         claims = data.get("claims") if isinstance(data, dict) else data
-        _print(check(claims or [], args.reported_hash))
-        return 0
+        report = check(claims or [], reported_hash=args.reported_hash)
+        _print(report)
+        return 0 if report["ok"] else 1
     if args.cmd == "make-receipt":
         key = _key(args.key_file)
         if key is None and not args.allow_unsigned:
