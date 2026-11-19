@@ -9,3 +9,13 @@ receipt.json
 claims.json
 intent.json
 result.json
+
+# gama-secrets-guard
+.env
+*.token
+*.key
+*.pem
+tenants.json
+.git-credentials
+__pycache__/
+*.pyc
