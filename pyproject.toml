@@ -28,3 +28,7 @@ proofgate-mcp = "proofgate_runtime.mcp_server:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
