@@ -104,7 +104,7 @@ Tools: `verify_claims`, `make_receipt`, `verify_receipt`, `check_injection`, `ru
 
 - [`sigil`](https://github.com/gamai-io/sigil) — proof-carrying execution: grants, receipts, anchor, conformance.
 - [`gamai-guard`](https://github.com/gamai-io/gamai-guard) — multilingual prompt-injection cascade.
-- [`crossnode-bench`](https://github.com/gamai-io/crossnode-bench) — claim-vs-truth benchmark (25,600 controlled trials; 93.75% pass; 6.25% planted lies flagged; 0 false-success on read/action/cross).
+- [`crossnode-bench`](https://github.com/gamai-io/crossnode-bench) — claim-vs-truth benchmark. Shipped v1.4.0: honest fleet **25,600/25,600 pass, 0 false successes**; controlled liar variant 28,800 records with **400 false successes, all on the lying node** (detected). The separate 93.75% / 6.25% Slurm run is reported in `evidence-gate-runtime` and its dataset is not public yet.
 - [`evidence-gate-runtime`](https://github.com/gamai-io/evidence-gate-runtime) — fuller runtime with replay.
 - [`floor-copilot`](https://github.com/gamai-io/floor-copilot) — production case study: invoice intake with 17% VAT gate.
 
