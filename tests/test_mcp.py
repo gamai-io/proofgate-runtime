@@ -32,12 +32,23 @@ class McpTests(unittest.TestCase):
         out = handle({"jsonrpc": "2.0", "id": 4, "method": "nope"})
         self.assertEqual(out["error"]["code"], -32601)
 
-    def test_unsigned_receipt_warning_is_hashed(self):
-        with mock.patch.dict(os.environ, {"PROOFGATE_HMAC_KEY": ""}):
+    def test_unsigned_receipt_is_refused_by_default(self):
+        with mock.patch.dict(os.environ, {"PROOFGATE_HMAC_KEY": "",
+                                          "PROOFGATE_ALLOW_UNSIGNED": ""}):
             out = handle({"jsonrpc": "2.0", "id": 5, "method": "tools/call", "params": {
                 "name": "make_receipt", "arguments": {"intent": {"op": "x"},
                                                       "result": {"ok": True}}}})
+        self.assertTrue(out["result"].get("isError"), out)
+        self.assertIn("unsigned", out["result"]["content"][0]["text"])
+
+    def test_unsigned_must_be_opted_into_explicitly(self):
+        with mock.patch.dict(os.environ, {"PROOFGATE_HMAC_KEY": "",
+                                          "PROOFGATE_ALLOW_UNSIGNED": "1"}):
+            out = handle({"jsonrpc": "2.0", "id": 6, "method": "tools/call", "params": {
+                "name": "make_receipt", "arguments": {"intent": {"op": "x"},
+                                                      "result": {"ok": True}}}})
         rec = json.loads(out["result"]["content"][0]["text"])
+        self.assertFalse(rec["signed"])
         self.assertIn("_warning", rec)
         check = verify_receipt(rec, require_signature=False)
         self.assertTrue(check["valid"], check)

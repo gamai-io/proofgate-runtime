@@ -27,7 +27,7 @@ TOOLS = [
     },
     {
         "name": "make_receipt",
-        "description": "Create a SHA-256-bound receipt for an intent/result (unsigned over MCP; use CLI to sign).",
+        "description": "Create a SHA-256-bound receipt for an intent/result. Requires PROOFGATE_HMAC_KEY; unsigned is refused unless PROOFGATE_ALLOW_UNSIGNED=1.",
         "inputSchema": {
             "type": "object",
             "properties": {"intent": {}, "result": {}, "meta": {"type": "object"}},
@@ -76,9 +76,16 @@ def call_tool(name: str, args: dict) -> dict:
         if "intent" not in args or "result" not in args:
             return _text({"error": "intent and result are required"}, True)
         key = os.environ.get("PROOFGATE_HMAC_KEY") or None
-        extra = None
+        allow_unsigned = os.environ.get("PROOFGATE_ALLOW_UNSIGNED") == "1"
+        if not key and not allow_unsigned:
+            # verify_receipt rejects unsigned receipts by default; minting one
+            # here would hand the caller something its own verifier refuses
+            return _text({"error": "unsigned receipt refused",
+                          "detail": "set PROOFGATE_HMAC_KEY, or "
+                                    "PROOFGATE_ALLOW_UNSIGNED=1 to opt in"}, True)
+        extra = {"signed": bool(key)}
         if not key:
-            extra = {"_warning": "unsigned: set PROOFGATE_HMAC_KEY to sign MCP receipts"}
+            extra["_warning"] = "unsigned: PROOFGATE_ALLOW_UNSIGNED=1"
         rec = make_receipt(args["intent"], args["result"], key=key,
                            meta=args.get("meta"), extra=extra)
         return _text(rec)
